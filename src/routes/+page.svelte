@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import Card from '$lib/components/Card.svelte';
+	import Card from '$lib/components/card.svelte';
 
 	interface DeckCard {
 		id: string;
