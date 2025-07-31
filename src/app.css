@@ -1,0 +1,31 @@
+@import 'tailwindcss';
+
+/* Disable text selection on interactive elements */
+button,
+.card,
+.pile {
+	-webkit-tap-highlight-color: transparent;
+}
+
+/* View Transitions API support */
+@view-transition {
+	navigation: auto;
+}
+
+/* Prevent pull-to-refresh on mobile */
+html {
+	overscroll-behavior: none;
+}
+
+/* Custom card dimensions using Tailwind's spacing scale extension */
+.w-50 {
+	width: 12.5rem; /* 200px */
+}
+
+.h-70 {
+	height: 17.5rem; /* 280px */
+}
+
+.w-62 {
+	width: 15.625rem; /* 250px */
+}
