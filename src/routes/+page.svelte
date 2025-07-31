@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import Card from '$lib/components/card.svelte';
+	import { shuffleArray } from '$lib/shuffle';
 
 	interface DeckCard {
 		id: string;
@@ -45,8 +46,8 @@
 	let dialogElement: HTMLDialogElement;
 
 	// Initialize with shuffled deck
-	function initializeDeck(): void {
-		deck = [...sorryDeck.cards].sort(() => Math.random() - 0.5);
+	function resetDeck(): void {
+		deck = shuffleArray(sorryDeck.cards);
 		discardPile = [];
 		selectedCard = null;
 	}
@@ -58,7 +59,7 @@
 	function drawCard(): void {
 		if (deck.length === 0) {
 			if (sorryDeck.emptyDeckBehavior === 'shuffle' && discardPile.length > 0) {
-				shuffleAndRestart();
+				resetDeck();
 				// Draw the first card after shuffling
 				if (deck.length > 0) {
 					selectedCard = deck[deck.length - 1];
@@ -82,12 +83,6 @@
 		dialogElement?.close();
 	}
 
-	function shuffleAndRestart(): void {
-		deck = [...sorryDeck.cards, ...discardPile].sort(() => Math.random() - 0.5);
-		discardPile = [];
-		selectedCard = null;
-	}
-
 	function cancelSelection(): void {
 		selectedCard = null;
 		dialogElement?.close();
@@ -98,7 +93,7 @@
 	}
 
 	onMount(() => {
-		initializeDeck();
+		resetDeck();
 		checkOrientation();
 		window.addEventListener('resize', checkOrientation);
 		return () => window.removeEventListener('resize', checkOrientation);
@@ -116,7 +111,7 @@
 	<!-- Game Controls -->
 	<div class="mb-4 flex gap-4">
 		<button
-			onclick={shuffleAndRestart}
+			onclick={resetDeck}
 			class="rounded-lg bg-blue-500 px-4 py-2 font-medium text-white transition-colors duration-200 hover:bg-blue-600"
 		>
 			New Game
@@ -144,7 +139,7 @@
 				{:else if sorryDeck.emptyDeckBehavior === 'shuffle' && discardPile.length > 0}
 					<button
 						class="shuffle-button h-70 w-50 cursor-pointer rounded-xl bg-gradient-to-br from-green-500 to-green-600 text-lg font-semibold text-white shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-xl active:translate-y-0"
-						onclick={shuffleAndRestart}
+						onclick={resetDeck}
 					>
 						Shuffle & Restart
 					</button>
