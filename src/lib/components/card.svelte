@@ -66,7 +66,7 @@
 	{onclick}
 	id={card.id}
 	class={[
-		'card absolute h-70 w-50 transition-transform duration-500 perspective-normal transform-3d',
+		'card absolute box-content aspect-[5/7] h-full max-h-[calc(100%_-_2rem)] w-auto max-w-[calc(100%_-_2rem)] transition-transform duration-500 perspective-normal transform-3d',
 		onclick && 'cursor-pointer',
 		isModal && 'modal',
 		card.moving ? 'moving' : '',
@@ -112,30 +112,5 @@
 		width: 15.625rem; /* 250px */
 		height: 21.875rem; /* 350px */
 		box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
-	}
-
-	/* Responsive sizing for mobile */
-	@media (max-width: 768px) {
-		.card {
-			width: min(200px, 40vw);
-			height: min(280px, 56vw);
-		}
-
-		.card.modal {
-			width: min(280px, 70vw);
-			height: min(392px, 98vw);
-		}
-	}
-
-	@media (max-width: 480px) {
-		.card {
-			width: min(180px, 42vw);
-			height: min(252px, 58.8vw);
-		}
-
-		.card.modal {
-			width: min(250px, 75vw);
-			height: min(350px, 105vw);
-		}
 	}
 </style>

@@ -66,76 +66,67 @@
 </svelte:head>
 
 <main
-	class="flex flex-1 flex-col items-center justify-center gap-6 bg-gradient-to-br from-slate-50 to-slate-300 p-4"
+	class="flex w-full flex-1 flex-col items-center justify-center gap-4 bg-gradient-to-br from-slate-50 to-slate-300 p-4"
 >
-	<div>
-		Next to draw: {gameState.player}
-	</div>
+	{#if gameState.players.length > 0}
+		<div>
+			Next to draw: {gameState.player}
+		</div>
+	{/if}
 	{#if gameState.deck}
 		<div
-			class="deck-area flex w-full max-w-4xl items-center justify-center gap-8 perspective-normal {isPortrait
-				? 'flex-col gap-6'
-				: ''}"
+			class="deck-area grid h-full w-full max-w-4xl flex-1 items-center justify-center gap-4 perspective-normal {isPortrait
+				? 'grid-cols-1 grid-rows-2'
+				: 'grid-cols-2 grid-rows-1'}"
 		>
-			<!-- Draw Pile -->
-			<div class="pile-container flex max-w-sm flex-1 flex-col items-center gap-4">
-				<div class="pile-wrapper relative">
-					<div
-						class="empty-pile flex h-70 w-50 items-center justify-center rounded-xl border-2 border-dashed border-slate-400 bg-white/50 font-medium text-slate-600"
-					>
-						{#if gameState.drawPile.length > 0}
-							{#if gameState.drawPile.length > 1}
-								<Card
-									card={gameState.drawPile[gameState.drawPile.length - 2]}
-									deckConfig={gameState.deck}
-									isBack={true}
-								/>
-							{/if}
-							<Card card={topDrawCard} deckConfig={gameState.deck} isBack={true} onclick={draw} />
-						{:else if gameState.deck.emptyDeckBehavior === 'shuffle' && gameState.discardPile.length > 0}
-							<button
-								class="cursor-pointer rounded-md bg-gradient-to-br from-green-500 to-green-600 px-4 py-2 text-lg font-semibold text-white shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-xl active:translate-y-0"
-								onclick={() => gameState.resetDeck()}
-							>
-								Shuffle & Restart
-							</button>
-						{:else}
-							{gameState.deck.emptyDeckMessage || 'Deck Empty'}
+			<div class="pile-wrapper relative h-full w-full">
+				<div
+					class="empty-pile box-border flex h-full w-full items-center justify-center rounded-xl border-2 border-dashed border-slate-400 bg-white/50 p-2 font-medium text-slate-600"
+				>
+					{#if gameState.drawPile.length > 0}
+						{#if gameState.drawPile.length > 1}
+							<Card
+								card={gameState.drawPile[gameState.drawPile.length - 2]}
+								deckConfig={gameState.deck}
+								isBack={true}
+							/>
 						{/if}
-					</div>
-					<span
-						class="absolute top-0 right-0 inline-flex translate-x-1/2 -translate-y-1/2 items-center rounded-full bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-blue-700/30 ring-inset"
-						>{gameState.drawPile.length}</span
-					>
+						<Card card={topDrawCard} deckConfig={gameState.deck} isBack={true} onclick={draw} />
+					{:else if gameState.deck.emptyDeckBehavior === 'shuffle' && gameState.discardPile.length > 0}
+						<button
+							class="cursor-pointer rounded-md bg-gradient-to-br from-green-500 to-green-600 px-4 py-2 text-lg font-semibold text-white shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-xl active:translate-y-0"
+							onclick={() => gameState.resetDeck()}
+						>
+							Shuffle & Restock
+						</button>
+					{:else}
+						{gameState.deck.emptyDeckMessage || 'Deck Empty'}
+					{/if}
 				</div>
+				<span
+					class="absolute top-0 right-0 inline-flex translate-x-1/2 -translate-y-1/2 items-center rounded-full bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-blue-700/30 ring-inset"
+					>{gameState.drawPile.length}</span
+				>
 			</div>
 
-			<!-- Discard Pile -->
-			<div class="pile-container flex max-w-sm flex-1 flex-col items-center gap-4">
-				<div class="pile relative">
-					<div
-						class="empty-pile flex h-70 w-50 items-center justify-center rounded-xl border-2 border-dashed border-slate-400 bg-white/50 font-medium text-slate-600"
-					>
-						Empty
-						{#if gameState.discardPile.length > 0}
-							{#if gameState.discardPile.length > 1}
-								<Card card={gameState.discardPile[1]} deckConfig={gameState.deck} isBack={false} />
-							{/if}
-							{#key topDiscardCard.id}
-								<Card
-									card={topDiscardCard}
-									deckConfig={gameState.deck}
-									isBack={moving}
-									onclick={() => (moving = false)}
-								/>
-							{/key}
+			<div class="pile relative size-full">
+				<div
+					class="empty-pile flex h-full w-full items-center justify-center rounded-xl border-2 border-dashed border-slate-400 bg-white/50 p-2 font-medium text-slate-600"
+				>
+					Empty
+					{#if gameState.discardPile.length > 0}
+						{#if gameState.discardPile.length > 1}
+							<Card card={gameState.discardPile[1]} deckConfig={gameState.deck} isBack={false} />
 						{/if}
-					</div>
-					<span
-						class="absolute top-0 right-0 inline-flex translate-x-1/2 -translate-y-1/2 items-center rounded-full bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-blue-700/30 ring-inset"
-						>{gameState.discardPile.length}</span
-					>
+						{#key topDiscardCard.id}
+							<Card card={topDiscardCard} deckConfig={gameState.deck} isBack={moving} />
+						{/key}
+					{/if}
 				</div>
+				<span
+					class="absolute top-0 right-0 inline-flex translate-x-1/2 -translate-y-1/2 items-center rounded-full bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-blue-700/30 ring-inset"
+					>{gameState.discardPile.length}</span
+				>
 			</div>
 		</div>
 		<!-- Selected Card Dialog -->

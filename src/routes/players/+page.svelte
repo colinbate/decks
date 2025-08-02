@@ -1,5 +1,9 @@
 <script lang="ts">
 	import { gameState } from '$lib/game-state.svelte';
+	import { shuffleArray } from '$lib/shuffle';
+	function shuffle() {
+		shuffleArray(gameState.players);
+	}
 </script>
 
 <main
@@ -24,7 +28,7 @@
 			</svg>
 		</button>
 	</h2>
-	<form class="w-full">
+	<form class="mb-4 w-full">
 		{#each gameState.players, index (index)}
 			<div class="mb-4">
 				<label for="email" class="block text-sm/6 font-medium text-gray-900"
@@ -43,4 +47,10 @@
 			</div>
 		{/each}
 	</form>
+	<div class="flex items-center gap-4">
+		<a href="/" class="block rounded-md bg-[#ff3e00] px-4 py-2 text-white">Return to Deck</a>
+		<button type="button" class="rounded-md bg-[#ff3e00] px-4 py-2 text-white" onclick={shuffle}
+			>Shuffle Players</button
+		>
+	</div>
 </main>
