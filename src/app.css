@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@plugin "@tailwindcss/forms";
 
 /* Disable text selection on interactive elements */
 button,
@@ -28,4 +29,7 @@ html {
 
 .w-62 {
 	width: 15.625rem; /* 250px */
+}
+::view-transition-group(moving) {
+	animation-duration: 0.5s;
 }

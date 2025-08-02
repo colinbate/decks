@@ -1,35 +1,22 @@
 <script lang="ts">
-	interface DeckCard {
-		text: string;
-		frontImage?: string;
-		backImage?: string;
-		frontColor?: string;
-		backColor?: string;
-	}
-
-	interface DeckConfig {
-		defaultBackColor?: string;
-		defaultFrontColor?: string;
-		defaultBackImage?: string;
-		defaultFrontImage?: string;
-	}
+	import type { Deck, DeckCard } from '$lib/types';
 
 	let {
 		card,
 		deckConfig,
 		isBack = false,
-		isClickable = false,
 		isModal = false,
+		onclick,
 	}: {
 		card: DeckCard;
-		deckConfig: DeckConfig;
+		deckConfig: Deck;
 		isBack?: boolean;
-		isClickable?: boolean;
 		isModal?: boolean;
+		onclick?: (ev: MouseEvent) => void;
 	} = $props();
 
-	function getBackgroundStyle(isCardBack: boolean): string {
-		if (isCardBack) {
+	function getBackgroundStyle(side: 'back' | 'front'): string {
+		if (side === 'back') {
 			// Back of card
 			if (card.backImage) {
 				return `background-image: url(${card.backImage});`;
@@ -75,26 +62,47 @@
 	}
 </script>
 
-<div
-	class="card relative flex h-70 w-50 items-center justify-center rounded-xl border-2 border-slate-800 shadow-lg transition-all duration-300 select-none {isClickable
-		? 'cursor-pointer hover:-translate-y-1 hover:shadow-xl'
-		: ''} {isModal ? 'modal' : ''}"
-	style={getBackgroundStyle(isBack)}
+<button
+	{onclick}
+	id={card.id}
+	class={[
+		'card absolute h-70 w-50 transition-transform duration-500 perspective-normal transform-3d',
+		onclick && 'cursor-pointer',
+		isModal && 'modal',
+		card.moving ? 'moving' : '',
+		!isBack && 'rotate-y-180',
+	]}
 >
-	{#if !isBack && card.text}
-		<div
-			class="card-text flex h-full max-w-[90%] items-center justify-center p-4 text-center leading-tight font-bold break-words hyphens-auto text-slate-800"
-			style="font-size: {getFontSize(
-				card.text
-			)}; text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);"
-		>
-			{card.text}
-		</div>
-	{/if}
-</div>
+	<!-- Back -->
+	<div
+		class={[
+			'card-face bg-muted absolute inset-0 flex items-center justify-center rounded-xl border-2 border-slate-800 shadow-lg backface-hidden',
+		]}
+		style={getBackgroundStyle('back')}
+	></div>
+	<!-- Front -->
+	<div
+		class="card-face bg-muted absolute inset-0 flex rotate-y-180 items-center justify-center rounded-xl border-2 border-slate-800 shadow-lg backface-hidden"
+		style={getBackgroundStyle('front')}
+	>
+		{#if card.text}
+			<div
+				class="card-text flex h-full max-w-[90%] items-center justify-center p-4 text-center leading-tight font-bold break-words hyphens-auto text-slate-800 select-none"
+				style="font-size: {getFontSize(
+					card.text
+				)}; text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);"
+			>
+				{card.text}
+			</div>
+		{/if}
+	</div>
+</button>
 
 <style>
-	.card {
+	.card.moving {
+		view-transition-name: moving;
+	}
+	.card-face {
 		background-size: cover !important;
 		background-position: center !important;
 		background-repeat: no-repeat !important;
