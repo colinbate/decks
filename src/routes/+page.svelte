@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import Card from '$lib/components/card.svelte';
 	import type { DeckCard } from '$lib/types';
 	import { gameState } from '$lib/game-state.svelte';
@@ -33,17 +33,18 @@
 		if (!document.startViewTransition) {
 			gameState.drawCard();
 			topDiscardCard.moving = false;
-			await delay(150);
+			await delay(100);
 			moving = false;
 			gameState.nextTurn();
 			return;
 		}
-		const transition = document.startViewTransition(() => {
+		const transition = document.startViewTransition(async () => {
 			gameState.drawCard();
+			await tick();
 		});
 		await transition.finished;
 		topDiscardCard.moving = false;
-		await delay(150);
+		await delay(100);
 		moving = false;
 		gameState.nextTurn();
 	}
@@ -66,7 +67,7 @@
 </svelte:head>
 
 <main
-	class="flex w-full flex-1 flex-col items-center justify-center gap-4 bg-gradient-to-br from-slate-50 to-slate-300 p-4"
+	class="flex w-full flex-1 flex-col items-center justify-center gap-4 overflow-y-hidden bg-gradient-to-br from-slate-50 to-slate-300 p-4"
 >
 	{#if gameState.players.length > 0}
 		<div>
@@ -81,7 +82,7 @@
 		>
 			<div class="pile-wrapper relative h-full w-full">
 				<div
-					class="empty-pile box-border flex h-full w-full items-center justify-center rounded-xl border-2 border-dashed border-slate-400 bg-white/50 p-2 font-medium text-slate-600"
+					class="empty-pile box-border flex h-full w-full items-center justify-center rounded-xl border-2 border-dashed border-slate-400 bg-white/50 object-contain p-2 font-medium text-slate-600"
 				>
 					{#if gameState.drawPile.length > 0}
 						{#if gameState.drawPile.length > 1}
@@ -89,9 +90,16 @@
 								card={gameState.drawPile[gameState.drawPile.length - 2]}
 								deckConfig={gameState.deck}
 								isBack={true}
+								{isPortrait}
 							/>
 						{/if}
-						<Card card={topDrawCard} deckConfig={gameState.deck} isBack={true} onclick={draw} />
+						<Card
+							card={topDrawCard}
+							deckConfig={gameState.deck}
+							isBack={true}
+							onclick={draw}
+							{isPortrait}
+						/>
 					{:else if gameState.deck.emptyDeckBehavior === 'shuffle' && gameState.discardPile.length > 0}
 						<button
 							class="cursor-pointer rounded-md bg-gradient-to-br from-green-500 to-green-600 px-4 py-2 text-lg font-semibold text-white shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-xl active:translate-y-0"
@@ -114,14 +122,14 @@
 					class="empty-pile flex h-full w-full items-center justify-center rounded-xl border-2 border-dashed border-slate-400 bg-white/50 p-2 font-medium text-slate-600"
 				>
 					Empty
-					{#if gameState.discardPile.length > 0}
-						{#if gameState.discardPile.length > 1}
-							<Card card={gameState.discardPile[1]} deckConfig={gameState.deck} isBack={false} />
-						{/if}
-						{#key topDiscardCard.id}
-							<Card card={topDiscardCard} deckConfig={gameState.deck} isBack={moving} />
-						{/key}
-					{/if}
+					{#each gameState.discardPile.slice(0, 2).reverse() as card, ii (card.id)}
+						<Card
+							{card}
+							deckConfig={gameState.deck}
+							isBack={moving ? ii === 1 || gameState.discardPile.length === 1 : false}
+							{isPortrait}
+						/>
+					{/each}
 				</div>
 				<span
 					class="absolute top-0 right-0 inline-flex translate-x-1/2 -translate-y-1/2 items-center rounded-full bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-blue-700/30 ring-inset"

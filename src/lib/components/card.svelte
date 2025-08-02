@@ -1,17 +1,20 @@
 <script lang="ts">
 	import type { Deck, DeckCard } from '$lib/types';
+	import SvgText from './svg-text.svelte';
 
 	let {
 		card,
 		deckConfig,
 		isBack = false,
 		isModal = false,
+		isPortrait = false,
 		onclick,
 	}: {
 		card: DeckCard;
 		deckConfig: Deck;
 		isBack?: boolean;
 		isModal?: boolean;
+		isPortrait?: boolean;
 		onclick?: (ev: MouseEvent) => void;
 	} = $props();
 
@@ -50,27 +53,18 @@
 			return `background: #ffffff;`;
 		}
 	}
-
-	function getFontSize(text: string): string {
-		if (!text) return '1rem';
-
-		const length = text.length;
-		if (length <= 2) return isModal ? '3rem' : '2rem';
-		if (length <= 5) return isModal ? '2rem' : '1.5rem';
-		if (length <= 10) return isModal ? '1.5rem' : '1.2rem';
-		return isModal ? '1.2rem' : '1rem';
-	}
 </script>
 
 <button
 	{onclick}
 	id={card.id}
 	class={[
-		'card absolute box-content aspect-[5/7] h-full max-h-[calc(100%_-_2rem)] w-auto max-w-[calc(100%_-_2rem)] transition-transform duration-500 perspective-normal transform-3d',
+		'card absolute box-content aspect-[5/7] max-h-[calc(100%_-_2rem)] max-w-[calc(100%_-_2rem)] transition-transform duration-500 perspective-normal transform-3d',
 		onclick && 'cursor-pointer',
 		isModal && 'modal',
 		card.moving ? 'moving' : '',
 		!isBack && 'rotate-y-180',
+		isPortrait ? 'h-full w-auto' : 'h-auto w-full',
 	]}
 >
 	<!-- Back -->
@@ -81,21 +75,21 @@
 		style={getBackgroundStyle('back')}
 	></div>
 	<!-- Front -->
-	<div
-		class="card-face bg-muted absolute inset-0 flex rotate-y-180 items-center justify-center rounded-xl border-2 border-slate-800 shadow-lg backface-hidden"
-		style={getBackgroundStyle('front')}
-	>
-		{#if card.text}
-			<div
-				class="card-text flex h-full max-w-[90%] items-center justify-center p-4 text-center leading-tight font-bold break-words hyphens-auto text-slate-800 select-none"
-				style="font-size: {getFontSize(
-					card.text
-				)}; text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);"
-			>
-				{card.text}
-			</div>
-		{/if}
-	</div>
+	{#if !card.moving}
+		<div
+			class="card-face bg-muted absolute inset-0 flex rotate-y-180 items-center justify-center rounded-xl border-2 border-slate-800 shadow-lg backface-hidden"
+			style={getBackgroundStyle('front')}
+		>
+			{#if card.text}
+				<div
+					class="card-text flex h-full max-w-[90%] items-center justify-center p-4 text-center leading-tight font-bold break-words hyphens-auto text-slate-800 select-none"
+					style="text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);"
+				>
+					<SvgText text={card.text} />
+				</div>
+			{/if}
+		</div>
+	{/if}
 </button>
 
 <style>
